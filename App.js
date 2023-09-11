@@ -63,12 +63,16 @@ export default function App() {
           </Text>
         </View>
       ))}
+      <Button 
+        title="Add More Meters" 
+        onPress={() => {
+          const newMeters = [...meters, {lastReading: 0, currentReading: 0, lastReadingDate: ''}];
+          setMeters(newMeters);
+          storeData(newMeters);
+        }}
+        disabled={meters.length >= 3}
+      />
 
-      <Button title="Add More Meters" onPress={() => {
-        const newMeters = [...meters, {lastReading: 0, currentReading: 0, lastReadingDate: ''}];
-        setMeters(newMeters);
-        storeData(newMeters);
-      }}/>
 
     </View>
   );
