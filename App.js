@@ -4,6 +4,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [meters, setMeters] = useState([{lastReading: 0, currentReading: 0, lastReadingDate: ''}]);
+  const removeMeter = (index) => {
+    const newMeters = meters.filter((_, i) => i !== index);
+    setMeters(newMeters);
+    storeData(newMeters);
+  };
+  
 
   useEffect(() => {
     getData().then(data => {
@@ -61,6 +67,7 @@ export default function App() {
           <Text style={styles.differenceText}>
             Difference: {calculateDifference(meter.lastReading, meter.currentReading)}
           </Text>
+          <Button title="Remove Meter" onPress={() => removeMeter(index)}/>
         </View>
       ))}
       <Button 
