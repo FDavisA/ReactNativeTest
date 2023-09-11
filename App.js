@@ -1,13 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [meters, setMeters] = useState([{lastReading: 0, currentReading: 0, lastReadingDate: ''}]);
 
+  useEffect(() => {
+    getData().then(data => {
+      if (data) setMeters(data);
+    });
+  }, []);
+
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value)
+      await AsyncStorage.setItem('@meter_readings', jsonValue)
+    } catch (e) {
+      // saving error
+    }
+  }
+
+  const getData = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@meter_readings')
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch(e) {
+      // error reading value
+    }
+  }
+
   const handleInputChange = (text, index, field) => {
-    const tempMeters = [...meters];
-    tempMeters[index][field] = text;
-    setMeters(tempMeters);
+    const newMeters = [...meters];
+    newMeters[index][field] = text;
+    setMeters(newMeters);
+    storeData(newMeters);
   };
 
   const calculateDifference = (lastReading, currentReading) => {
@@ -38,7 +64,11 @@ export default function App() {
         </View>
       ))}
 
-      <Button title="Add More Meters" onPress={() => setMeters([...meters, {lastReading: 0, currentReading: 0, lastReadingDate: ''}])}/>
+      <Button title="Add More Meters" onPress={() => {
+        const newMeters = [...meters, {lastReading: 0, currentReading: 0, lastReadingDate: ''}];
+        setMeters(newMeters);
+        storeData(newMeters);
+      }}/>
 
     </View>
   );
